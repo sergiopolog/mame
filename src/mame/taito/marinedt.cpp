@@ -653,7 +653,7 @@ void marinedt_state::marinedt(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(marinedt_state::irq0_line_hold));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(marinedt_state::screen_update));
 	// TODO: unverified, template to get ~60 fps
 	m_screen->set_raw(MAIN_CLOCK / 2, 328, 0, 256, 263, 32, 256);
@@ -706,4 +706,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, empty_init, ROT90, "Taito", "Marine Date", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, empty_init, ROT90, "Taito", "Marine Date", MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -84,9 +84,9 @@ public:
 		, m_kbdio(*this, "Y%u", 1)
 	{ }
 
-	void poisk1(machine_config &config);
+	void poisk1(machine_config &config) ATTR_COLD;
 
-	void init_poisk1();
+	void init_poisk1() ATTR_COLD;
 
 	void fdc_config(device_t *device);
 
@@ -706,7 +706,7 @@ void p1_state::poisk1(machine_config &config)
 	// fake hsync
 	TIMER(config, "scantimer").configure_scanline(FUNC(p1_state::hsync_changed), "screen", 0, 1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(15'000'000), 912,0,640, 262,0,200);
 	m_screen->set_screen_update(FUNC(p1_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(p1_state::vsync_changed));

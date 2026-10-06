@@ -200,6 +200,7 @@ public:
 	void init_tct2p() ATTR_COLD;
 	void init_xypdk() ATTR_COLD;
 	void init_ccly() ATTR_COLD;
+	void init_tswx() ATTR_COLD;
 	void init_tswxp() ATTR_COLD;
 	void init_royal5p() ATTR_COLD;
 	void init_jhg3d() ATTR_COLD;
@@ -2549,7 +2550,7 @@ void igs_m027_state::m027_noppi(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -3413,6 +3414,24 @@ ROM_START( lhzb3106c5m )
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "igs_s2402.u26", 0x000000, 0x200000, CRC(84bc2f3e) SHA1(49dcf5eaa39accd5c6bf01782fd4221298cb43ed) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
+ROM_START( lhzb3p ) // IGS PCB N0-0241
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "d9_igs027a.u13", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "lhzb3jqb_v_200c5m.u9", 0x00000, 0x80000, CRC(024b910b) SHA1(8406a0bbd615f728aaa55a160de9427059ada195) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_m2403_image_v101.u17", 0x000000, 0x80000,CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m2401.u18", 0x000000, 0x400000,  CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "igs_s2402_speech_v100.u14", 0x000000, 0x100000, CRC(56083fe2) SHA1(62afd651809bf5e639bfda6e5579dbf4b903b664) )
 ROM_END
 
 // This board is a bit different to the others. Main OSC is 22.1184MHz.
@@ -4520,6 +4539,26 @@ ROM_START( jhg3d ) // IGS PCB-0376-01-FS. 3 banks of 8 switches. 1 PPI.
 	ROM_LOAD( "v-445cn.u20", 0x00000, 0x40000, CRC(e6aac74d) SHA1(b8f88b894383cd3eab4b00a20b74ee84dea61672) )
 ROM_END
 
+// 泰山五线 (Tàishān Wǔxiàn)
+ROM_START( tswx ) // IGS PCB-0489-10-FM-1. 3 banks of 8 switches. 1 PPI.
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "m3_027a.u20", 0x0000, 0x4000, CRC(e9189b53) SHA1(6129450a3c03a4218e672f43d9e9c2a1a51551fc) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "u17", 0x00000, 0x80000, CRC(ddfb4cbb) SHA1(e1a435f7d6a08bdf81f4e523f8dcb7082a907db8) )
+
+	ROM_REGION( 0x200000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "text.u27", 0x000000, 0x200000, CRC(18fe9b5e) SHA1(dbcc6bf7a649dd07bad68add9b63a39a92e9f363) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "u29", 0x000000, 0x200000, CRC(d2b6358a) SHA1(e24aef98a06ea3bb8ce23ced2027de82a58e8a15) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_RELOAD(      0x200000, 0x200000 ) // game expects to read the ROM at this offset? Gameplay doesn't show missing GFX, so may be right size anyway
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "sp.u4", 0x000000, 0x200000, CRC(3976780a) SHA1(3229e58f096e298ce9545e1e85bbf7f067f10699) )
+ROM_END
+
 // 泰山五线 加强版 (Tàishān Wǔxiàn Jiāqiáng Bǎn)
 ROM_START( tswxp ) // IGS PCB-0489-17-FM-1. 2 banks of 8 switches (1 unpopulated). 1 PPI.
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -4677,9 +4716,9 @@ void igs_m027_state::init_gonefsh2()
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 
-	// bypass IGS025 'version' check
+	// HACK: bypass IGS025 'version' check
 	m_external_rom[0x1f894/4] ^= 0x00000100;
-	// bypass external ROM checksum
+	// HACK: bypass external ROM checksum
 	u32 *ROM2 = &memregion("maincpu")->as_u32();
 	ROM2[(0x168/4)] ^= 0x10000000;
 }
@@ -4784,9 +4823,9 @@ void igs_m027_state::init_chessc2()
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 
-	// bypass IGS025 'version' check
+	// HACK: bypass IGS025 'version' check
 	m_external_rom[0x207d8/4] ^= 0x00000100;
-	// bypass external ROM checksum
+	// HACK: bypass external ROM checksum
 	u32 *ROM2 = &memregion("maincpu")->as_u32();
 	ROM2[(0x168/4)] ^= 0x10000000;
 }
@@ -4869,6 +4908,13 @@ void igs_m027_state::init_xyxcxysj()
 	m_igs017_igs031->set_text_reverse_bits(true);
 }
 
+void igs_m027_state::init_tswx()
+{
+	tswx_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
 } // anonymous namespace
 
 
@@ -4919,6 +4965,7 @@ GAMEL( 2005, ccly,          crzybugs, ccly,         ccly,          igs_m027_stat
 GAME(  2001, cjsxp,         0,        cjsxp,        cjsxp,         igs_m027_state, init_klxyj,    ROT0, "IGS", "Huangpai Zuqiu Plus / Chaoji Shuangxing Plus (V103CN)", 0 )
 GAME(  2000, tshs,          0,        zhongguo,     tshs,          igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V201CN)", 0 )
 GAME(  2000, tshs101,       tshs,     tshs101,      tshs101,       igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // unemulated sound chips
+GAME(  2004, tswx,          0,        tct2p,        tswxp,         igs_m027_state, init_tswx,     ROT0, "IGS", "Taishan Wuxian (V309CN)", MACHINE_NOT_WORKING )
 GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian Jiaqiang Ban (V101CN)", 0 )
 GAME(  2000, mgfx,          0,        mgzz,         mgfx,          igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", 0 )
 GAME(  2004, xyxcxysj,      0,        xyxcxysj,     base,          igs_m027_state, init_xyxcxysj, ROT0, "IGS", "Xingyun Xiaochou / Xingyun Shouji (V233CN)", MACHINE_NOT_WORKING ) // IRQ problems
@@ -4946,3 +4993,4 @@ GAME(  2001, cjdh6tha,      cjdh6th,  m027_1ppi<false>, base,     igs_m027_state
 GAME(  200?, jhg3d,         0,        m027_1ppi<false>, base,     igs_m027_state, init_jhg3d,    ROT0, "IGS", "Jin Huangguan 3-dai (V445CN)", MACHINE_NOT_WORKING )
 GAME(  200?, tarzan2,       jking02,  m027_1ppi<false>, base,     igs_m027_state, init_tarzan2,  ROT0, "IGS", "Tarzan II (V101XB)", MACHINE_NOT_WORKING )
 GAME(  2006, magtree,       crzybugs, m027_1ppi<false>, base,     igs_m027_state, init_magtree,  ROT0, "IGS", "Magic Tree (V200PR)", MACHINE_NOT_WORKING )
+GAME(  199?, lhzb3p,        0,        m027_1ppi<false>, base,     igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III Jiaqiang Ban (V200C5N)", MACHINE_NOT_WORKING )

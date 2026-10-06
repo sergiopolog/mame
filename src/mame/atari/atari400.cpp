@@ -69,9 +69,9 @@
 #include "sound/dac.h"
 #include "sound/pokey.h"
 
-#include "bus/a800/a800_slot.h"
-#include "bus/a800/a800_carts.h"
-#include "bus/a800/a8sio.h"
+#include "bus/a800/cart/a800_slot.h"
+#include "bus/a800/cart/a800_carts.h"
+#include "bus/a800/sio/a8sio.h"
 #include "bus/vcs_ctrl/ctrl.h"
 
 #include "screen.h"
@@ -2005,7 +2005,7 @@ void a400_state::atari_common_nodac(machine_config &config)
 	M6502(config, m_maincpu, pokey_device::FREQ_17_EXACT);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
 	m_screen->set_palette("palette");
 //  m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);

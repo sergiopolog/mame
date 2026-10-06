@@ -1,21 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-/*
-
-    TODO:
-
-    - tape input/output
-    - PL-80 plotter
-    - serial printer
-    - thermal printer
-
-
-    Cassette: PSAVE works, and the result can be loaded into Emma02 emulator.
-              PLOAD works, but it may be necessary to unplug all slots to get
-              a reliable load. This is the same as real hardware.
-
-*/
-
 #include "emu.h"
 
 #include "bus/comx35/exp.h"
@@ -65,12 +49,16 @@ public:
 			m_modifiers(*this, "MODIFIERS")
 	{ }
 
-	void base(machine_config &config, const XTAL clock);
-	void pal(machine_config &config);
-	void ntsc(machine_config &config);
-	void comx35_pal_video(machine_config &config);
-	void comx35_ntsc_video(machine_config &config);
+	void pal(machine_config &config) ATTR_COLD;
+	void ntsc(machine_config &config) ATTR_COLD;
+	void comx35_pal_video(machine_config &config) ATTR_COLD;
+	void comx35_ntsc_video(machine_config &config) ATTR_COLD;
+
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cosmac_device> m_maincpu;
@@ -85,8 +73,7 @@ private:
 	required_ioport m_modifiers;
 	emu_timer *m_reset_done_timer = nullptr;
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
+	void base(machine_config &config, const XTAL clock) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(reset_done);
 
@@ -113,6 +100,7 @@ private:
 	void cdp1869_page_ram(address_map &map) ATTR_COLD;
 	void comx35_io(address_map &map) ATTR_COLD;
 	void comx35_mem(address_map &map) ATTR_COLD;
+
 	// processor state
 	int m_clear = 0;                // CPU mode
 	int m_q = 0;                    // Q flag
@@ -694,15 +682,13 @@ CDP1869_PCB_READ_MEMBER( comx35_state::comx35_pcb_r )
 
 void comx35_state::prd_w(int state)
 {
-	if ((m_prd == CLEAR_LINE) && (state == ASSERT_LINE))
+	if ((m_prd == ASSERT_LINE) && (state == CLEAR_LINE))
 	{
 		m_cr1 = m_iden ? CLEAR_LINE : ASSERT_LINE;
 		check_interrupt();
 	}
 
 	m_prd = state;
-
-	m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF1, state);
 }
 
 
@@ -777,6 +763,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	m_maincpu->set_addrmap(AS_IO, &comx35_state::comx35_io);
 	m_maincpu->wait_cb().set_constant(1);
 	m_maincpu->clear_cb().set(FUNC(comx35_state::clear_r));
+	m_maincpu->ef1_cb().set(m_vis, FUNC(cdp1869_device::predisplay_r));
 	m_maincpu->ef2_cb().set(FUNC(comx35_state::ef2_r));
 	m_maincpu->ef4_cb().set(FUNC(comx35_state::ef4_r));
 	m_maincpu->q_cb().set(FUNC(comx35_state::q_w));
@@ -808,7 +795,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 
 	// expansion bus
 	// FIXME: determine expansion bus clock frequency
-	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, "eb").irq_callback().set(FUNC(comx35_state::irq_w));
+	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, nullptr).irq_callback().set(FUNC(comx35_state::irq_w));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("32K");
@@ -890,5 +877,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                      FULLNAME          FLAGS
-COMP( 1983, comx35p, 0,       0,      pal,     comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (PAL)",  MACHINE_IMPERFECT_SOUND )
-COMP( 1983, comx35n, comx35p, 0,      ntsc,    comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (NTSC)", MACHINE_IMPERFECT_SOUND )
+COMP( 1983, comx35p, 0,       0,      pal,     comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (PAL)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, comx35n, comx35p, 0,      ntsc,    comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (NTSC)", MACHINE_SUPPORTS_SAVE )

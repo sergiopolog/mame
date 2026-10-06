@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -4500,16 +4500,15 @@ All weapons GFX displays are garbled in this version, is the dump right?
 		</part>
 	</software>
 
-	<software name="batlskin" supported="no">
+	<software name="batlskin" supported="yes">
 		<description>Battle Skin Panic - Zenra Senshi</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
-		<notes><![CDATA[
-Black screen, keeps spinning [FDC] motor in an awkward way
-]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19901215"/>
 		<info name="alt_title" value="バトルスキンパニック -全裸戦士-"/>
+		<!-- Really optional, but as first option given (1. mouse 2. joystick 3. keyboard) -->
+		<sharedfeat name="mouseport_default" value="mouse" />
 		<!--combined image-->
 		<!--rom name="battle skin panic.d88" size="1244928" crc="9269390a" sha1="3cdcf84e02d72e8862ec5ef8850dbdf1f99ab9fc"/-->
 
@@ -4910,10 +4909,12 @@ Note: cannot mix party from disk 1 and 2
 		<!--combined image-->
 		<!--rom name="the blade of blackpoole.d88" size="720144" crc="3e206ced" sha1="b60ba4fc2b8da86a58ec69f79b809d2ff517e6a8"/-->
 
+		<!-- ordered in a way where by default flop2 goes to second drive and -->
+		<!-- user just need to substitute first disk after prompt -->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="344496">
-				<rom name="the blade of blackpoole (disk a).d88" size="344496" crc="11d1a93e" sha1="1ca5eb64981218ee432f74600bba9eb70bbf5273"/>
+			<feature name="part_id" value="Disk BASIC" />
+			<dataarea name="flop" size="26800">
+				<rom name="the blade of blackpoole (disk basic).d88" size="26800" crc="3b20e875" sha1="6d6be0e50c412a84ddb0527d9dc1e5b2485461ac"/>
 			</dataarea>
 		</part>
 
@@ -4925,9 +4926,9 @@ Note: cannot mix party from disk 1 and 2
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C" />
-			<dataarea name="flop" size="26800">
-				<rom name="the blade of blackpoole (disk basic).d88" size="26800" crc="3b20e875" sha1="6d6be0e50c412a84ddb0527d9dc1e5b2485461ac"/>
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="344496">
+				<rom name="the blade of blackpoole (disk a).d88" size="344496" crc="11d1a93e" sha1="1ca5eb64981218ee432f74600bba9eb70bbf5273"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12381,8 +12382,8 @@ Optional [redbook] audio CD on PC-8801MC
 		<year>1991</year>
 		<publisher>テクノグラード (Techno Gurado)</publisher>
 		<notes><![CDATA[
-Crashes with any key press on title screen
-Sound gets stuck on PC8801mkIISR (verify)
+[FDC] Crashes at end of title screen BGM
+pc8801mk2sr: Sound gets stuck after title (verify)
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199112xx"/>
@@ -12410,13 +12411,13 @@ Sound gets stuck on PC8801mkIISR (verify)
 		</part>
 	</software>
 
-	<!-- No inputs on PC8801MA -->
-	<!-- Sound gets stuck on PC8801mkIISR [i8214 sound irq] -->
-	<!-- "syntax error" and resets during boot (regression after hooking i8214 irqs) -->
 	<software name="finalcria" cloneof="finalcri" supported="no">
 		<description>Final Crisis (alt)</description>
 		<year>1991</year>
 		<publisher>テクノグラード (Techno Gurado)</publisher>
+		<notes><![CDATA[
+(same as finalcri)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199112xx"/>
 		<info name="alt_title" value="ファイナルクライシス"/>
@@ -24470,12 +24471,12 @@ Should be supported by [PC8001mkIISR] too
 	</software>
 
 	<software name="nausicaa">
-		<description>Nausicaä Adventure Game</description>
+		<description>Kaze no Tani no Nausicaä</description>
 		<year>1984</year>
 		<publisher>徳間書店 (Tokuma Shoten Publishing)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198406xx"/>
-		<info name="alt_title" value="風の谷のナウシカ (Kaze no Tani no Naushika)"/>
+		<info name="alt_title" value="風の谷のナウシカ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348592">
 				<rom name="nausicaa.d88" size="348592" crc="fc9976be" sha1="24425dc8fa34e0636a7f7b246ceeef21dd459631"/>
@@ -30772,7 +30773,7 @@ Hangs or crashes at title screen
 		<!--rom name="sherwood forest.d88" size="720112" crc="d3889115" sha1="d25095ad26f23e8303a6a285b6e9bd32e47f1903"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk Basic" />
+			<feature name="part_id" value="Disk BASIC" />
 			<dataarea name="flop" size="26800">
 				<rom name="sherwood forest (disk basic).d88" size="26800" crc="ca2e1031" sha1="c659991217a256b94f361948211ac24e9518f803"/>
 			</dataarea>
@@ -32967,7 +32968,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 	</software>
 
 	<software name="mephius">
-		<description>Star Arthur Densetsu I - Wakusei Mephius</description>
+		<description>Star Arthur Densetsu I: Wakusei Mephius</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->
@@ -32981,7 +32982,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 	</software>
 
 	<software name="mephiusa" cloneof="mephius">
-		<description>Star Arthur Densetsu I - Wakusei Mephius (alt)</description>
+		<description>Star Arthur Densetsu I: Wakusei Mephius (alt)</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->
@@ -32995,7 +32996,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 	</software>
 
 	<software name="mephiush1" cloneof="mephius">
-		<description>Star Arthur Densetsu I - Wakusei Mephius (Fixed)</description>
+		<description>Star Arthur Densetsu I: Wakusei Mephius (fixed)</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->
@@ -33009,7 +33010,8 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 	</software>
 
 	<software name="mephiush2" cloneof="mephius">
-		<description>Star Arthur Densetsu I - Wakusei Mephius (patched works through the end)</description>
+		<!-- TODO: understand what the note claims -->
+		<description>Star Arthur Densetsu I: Wakusei Mephius (patched works through the end)</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->
@@ -33035,7 +33037,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 
 	<!-- Omake: run "SHUGYO" for a first person spaceship mini-game (eventually seen in the actual game too?) -->
 	<software name="ankosei" supported="yes">
-		<description>Star Arthur Densetsu II - Ankoku Seiun</description>
+		<description>Star Arthur Densetsu II: Ankoku Seiun</description>
 		<year>1984</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->
@@ -33052,7 +33054,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 
 	<!-- Omake: run "SHUGYO" for a first person spaceship mini-game (eventually seen in the actual game too?) -->
 	<software name="ankoseia" cloneof="ankosei" supported="yes">
-		<description>Star Arthur Densetsu II - Ankoku Seiun (alt)</description>
+		<description>Star Arthur Densetsu II: Ankoku Seiun (alt)</description>
 		<year>1984</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->
@@ -35890,7 +35892,7 @@ Runs too fast, requires [V1S] support
 		<!--rom name="transylvania.d88" size="720112" crc="212b6c2c" sha1="4132b2c81bf50abae2f2a003eba4f2431a08097a"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk Basic" />
+			<feature name="part_id" value="Disk BASIC" />
 			<dataarea name="flop" size="26800">
 				<rom name="transylvania (disk basic).d88" size="26800" crc="ca2e1031" sha1="c659991217a256b94f361948211ac24e9518f803"/>
 			</dataarea>
@@ -35926,7 +35928,7 @@ ExtractDisk  [02]"PROGRAM        " -> "transylvania_02.d88"
 		<!--rom name="transylvania.d88" size="375632" crc="d36aba7d" sha1="b8a1852507b399ea1607ddbcacc694a7af7a1875"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk Basic" />
+			<feature name="part_id" value="Disk BASIC" />
 			<dataarea name="flop" size="26800">
 				<rom name="transylvania (disk basic).d88" size="26800" crc="ca2e1031" sha1="c659991217a256b94f361948211ac24e9518f803"/>
 			</dataarea>
@@ -49924,7 +49926,7 @@ Not extensively tested
 		<!--rom name="mystery of egypt.d88" size="375648" crc="bc7820c2" sha1="08e98e154f46b612c2f2097bc0c4e0bb3804f9c3"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk Basic" />
+			<feature name="part_id" value="Disk BASIC" />
 			<dataarea name="flop" size="26800">
 				<rom name="mystery of egypt (disk basic).d88" size="26800" crc="d8cf19a6" sha1="e548f6e1200319301a47336a78dc454bd7d6e750"/>
 			</dataarea>

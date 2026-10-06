@@ -333,14 +333,14 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 	for(int i = 0; i < 32 ; i+=4) {
 		uint32_t temp;
 
-		temp = rotl_32(r, 1) ^ des_subkeys[subkey];
+		temp = std::rotl(r, 1) ^ des_subkeys[subkey];
 		l ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
 		l ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
 		l ^= DES_SBOX4[ (temp>>16) & 0x3f ];
 		l ^= DES_SBOX2[ (temp>>24) & 0x3f ];
 		subkey++;
 
-		temp = rotr_32(r, 3) ^ des_subkeys[subkey];
+		temp = std::rotr(r, 3) ^ des_subkeys[subkey];
 		l ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
 		l ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
 		l ^= DES_SBOX3[ (temp>>16) & 0x3f ];
@@ -349,14 +349,14 @@ uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, cons
 		if(decrypt)
 			subkey -= 4;
 
-		temp = rotl_32(l, 1) ^ des_subkeys[subkey];
+		temp = std::rotl(l, 1) ^ des_subkeys[subkey];
 		r ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
 		r ^= DES_SBOX6[ (temp>>8)  & 0x3f ];
 		r ^= DES_SBOX4[ (temp>>16) & 0x3f ];
 		r ^= DES_SBOX2[ (temp>>24) & 0x3f ];
 		subkey++;
 
-		temp = rotr_32(l, 3) ^ des_subkeys[subkey];
+		temp = std::rotr(l, 3) ^ des_subkeys[subkey];
 		r ^= DES_SBOX7[ (temp>>0)  & 0x3f ];
 		r ^= DES_SBOX5[ (temp>>8)  & 0x3f ];
 		r ^= DES_SBOX3[ (temp>>16) & 0x3f ];
@@ -764,25 +764,27 @@ uint64_t naomi_gdrom_board::i2cmem_dimm_r()
 {
 	uint8_t ret;
 
-	ret = m_i2c0->read_sda();
-	ret |= m_i2c1->read_sda();
+	ret = m_i2c0->read_sda() & m_i2c1->read_sda();
 	ret = ret << 1;
-	if (picbus_used == true)
+
+	if (picbus_used)
 		ret |= ((picbus | picbus_pullup) & 0xf) << 2;
 	else
 		ret |= m_eeprom->do_read() << 5;
+
 	return ret;
 }
 
 void naomi_gdrom_board::i2cmem_dimm_w(uint64_t data)
 {
-	if (data & 0x40000)
-	{
-		m_i2c0->write_sda((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		m_i2c1->write_sda((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-	}
-	m_i2c0->write_scl((data & 0x1) ? ASSERT_LINE : CLEAR_LINE);
-	m_i2c1->write_scl((data & 0x1) ? ASSERT_LINE : CLEAR_LINE);
+	const int sda = (data & 0x40000) ? BIT(data, 1) : 1;
+	const int scl = (data & 0x10000) ? BIT(data, 0) : 1;
+
+	m_i2c0->write_sda(sda);
+	m_i2c1->write_sda(sda);
+	m_i2c0->write_scl(scl);
+	m_i2c1->write_scl(scl);
+
 	if (data & 0x0200)
 	{
 		picbus_used = true;
